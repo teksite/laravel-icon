@@ -1,17 +1,25 @@
 <?php
 
-namespace Teksite\Authorize;
+namespace Teksite\IconLaravel;
 
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Teksite\Authorize\Models\Permission;
+use Teksite\IconLaravel\Component\Icon;
+use Teksite\IconLaravel\Service\IconManager;
 
 
 class IconLaravelServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->registerConfig();
+        $this->registerStubPath();
+
+
+        $this->app->singleton(IconManager::class, function ($app) {
+            return new IconManager($app['config']['svg-setting']);
+        });
+
     }
 
     /**
@@ -19,38 +27,32 @@ class IconLaravelServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->bootGates();
-        $this->loadMigrations();
+        $this->publish();
+
+        Blade::component('icon', Icon::class);
+
+
     }
 
-    public function bootGates(): void
+    public function registerConfig(): void
     {
-        if ($this->app->runningInConsole()) return;
+        $configPath = config_path('icon-setting.php');
+        $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', 'icon');
 
-        if (!Schema::hasTable('auth_permissions')
-            || !Schema::hasTable('auth_roles')
-            || !Schema::hasTable('auth_roles')
-        ) return;
-
-
-        if (!cache()->has('allPermissionsGates')) cache()->forever('allPermissionsGates', Permission::query()->select('title', 'id')->get());
-
-        $permissions = Permission::query()->select('title', 'id')->get();
-
-        foreach ($permissions as $permission) {
-            Gate::define($permission->title, function ($user) use ($permission) {
-                return $user->hasPermission($permission->title);
-            });
-        }
     }
 
-    /**
-     * @return void
-     */
-    private function loadMigrations(): void
+    public function registerStubPath(): void
     {
-        $migrationPath = __DIR__ . '/Migrations';
+        $this->app->bind('icon.default.list', function () {
+            return __DIR__ . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . 'icons.json';
+        });
 
-        if (is_dir($migrationPath)) $this->loadMigrationsFrom($migrationPath);
+    }
+
+    public function publish(): void
+    {
+        $this->publishes([
+            __DIR__ . '/config/icon-setting.php' => config_path('icon-setting.php'),
+        ], 'icon');
     }
 }
