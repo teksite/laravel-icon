@@ -1,0 +1,27 @@
+{
+    "name": "teksite/icon-laravel",
+    "description": "This package is a simple and tiny SVG icons fot laravel",
+    "authors": [
+        {
+            "name": "Sina Zangiband",
+            "email": "sina.zangiband@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Teksite\\Authorize\\": "src/"
+        }
+    },
+    "require": {
+        "laravel/framework": "^13.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Teksite\\Icon\\IconLaravelServiceProvider"
+            ]
+        }
+    }
+}
