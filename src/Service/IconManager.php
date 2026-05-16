@@ -52,8 +52,8 @@ class IconManager
     {
         $defaults = [];
         $defaultPath = app('icon.default.path');
-        $outlineFile= $defaultPath."outline.json";
-        $solidFile= $defaultPath."solid.json";
+        $outlineFile= $defaultPath."icon-outline.json";
+        $solidFile= $defaultPath."icon-solid.json";
         if (!File::exists($outlineFile)) {
             $solidList=  json_decode($outlineFile, true);
             if (is_array($solidList)) {

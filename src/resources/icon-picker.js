@@ -1,11 +1,12 @@
-import iconList from "./icons.json" assert { type: "json" };
+import outlineList from "./outline.json" assert {type: "json"};
+import solidList from "./solid.json" assert {type: "json"};
 
 export default function iconSetter(list = null) {
-    const iconsObject = list ?? iconList;
     const iconSelector = document.querySelectorAll('i.tkicon');
     iconSelector.forEach(item => {
+        const type = item.getAttribute('data-type') ?? 'outline';
         const icon = item.getAttribute('data-icon');
-        const iconPath = iconsObject[icon];
+        const iconPath = list ?? (type === 'solid' ? solidList : outlineList);
         if (iconPath) {
             const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             let attributes = {
