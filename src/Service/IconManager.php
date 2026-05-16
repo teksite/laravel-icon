@@ -77,7 +77,7 @@ class IconManager
     /**
      * Get an icon by name
      */
-    public function getIcon(string $name, array $attributes = []): string
+    public function getIcon(string $name, array $attributes = [] ,$render =false): string
     {
         if (!isset($this->icons[$name])) {
             return $this->renderNotFoundIcon($name, $attributes);
@@ -87,7 +87,9 @@ class IconManager
         $path = $this->icons[$name];
 
         unset($attributes['iconManager']);
-        return $this->renderSvg($path,$attributes);
+        return $render
+            ?$this->renderSvg($path,$attributes)
+            : $path;
     }
 
     /**

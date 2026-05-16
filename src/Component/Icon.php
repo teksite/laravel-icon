@@ -14,9 +14,8 @@ class Icon extends Component
     public function __construct(
         public IconManager $iconManager,
         public string      $icon,
+        public ?string     $title,
         public string      $viewbox = "0 0 24 24",
-        public string      $class = '',
-        public string      $title = '',
         public string      $x = '0px',
         public string      $y = '0px',
         public string      $width = '24',
@@ -29,12 +28,9 @@ class Icon extends Component
 
     }
 
-    public function render(): View|Htmlable|\Closure|string
+    public
+    function render(): View|Htmlable|\Closure|string
     {
-        return <<<'blade'
-<svg xmlns="http://www.w3.org/2000/svg" >
-    <!-- If you do not have a consistent goal in life, you can not live it in a consistent way. - Marcus Aurelius -->
-</svg>
-blade;
+        return view(config('/icon-setting.component', 'components.icon') ,['path'=>$this->iconManager->getIcon($this->icon)]);
     }
 }

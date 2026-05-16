@@ -15,7 +15,6 @@ class IconLaravelServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerStubPath();
 
-
         $this->app->singleton(IconManager::class, function ($app) {
             return new IconManager($app['config']['svg-setting']);
         });
@@ -37,7 +36,7 @@ class IconLaravelServiceProvider extends ServiceProvider
     public function registerConfig(): void
     {
         $configPath = config_path('icon-setting.php');
-        $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', 'icon');
+        $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', '/icon-setting');
 
     }
 
@@ -53,6 +52,6 @@ class IconLaravelServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/config/icon-setting.php' => config_path('icon-setting.php'),
-        ], 'icon');
+        ], '/icon-setting');
     }
 }
