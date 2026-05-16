@@ -13,6 +13,7 @@ class Icon extends Component
 
     public function __construct(
         public IconManager $iconManager,
+        public ?string      $type = 'outline',
         public string      $icon,
         public ?string     $title,
         public string      $viewbox = "0 0 24 24",
@@ -31,6 +32,6 @@ class Icon extends Component
     public
     function render(): View|Htmlable|\Closure|string
     {
-        return view(config('/icon-setting.component', 'components.icon') ,['path'=>$this->iconManager->getIcon($this->icon)]);
+        return view(config('/icon-setting.component', 'components.icon') ,['path'=>$this->iconManager->getIcon($this->icon, type:$this->type)]);
     }
 }
