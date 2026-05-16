@@ -1,5 +1,7 @@
 <?php
+
 namespace Teksite\IconLaravel\Service;
+
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
@@ -16,7 +18,7 @@ class IconManager
      */
     public function __construct()
     {
-        $this->config = config('icon' ,[]);
+        $this->config = config('icon', []);
         $this->loadIcons();
     }
 
@@ -45,17 +47,28 @@ class IconManager
 
     /**
      * Load default icons from package
-     * @throws FileNotFoundException
      */
     protected function loadDefaultIcons(): array
     {
-        $defaultPath = app('icon.default.list');
-        if (!File::exists($defaultPath)) {
-            return [];
+        $defaults = [];
+        $defaultPath = app('icon.default.path');
+        $outlineFile= $defaultPath."outline.json";
+        $solidFile= $defaultPath."solid.json";
+        if (!File::exists($outlineFile)) {
+            $solidList=  json_decode($outlineFile, true);
+            if (is_array($solidList)) {
+                $defaults = array_merge($defaults, $solidList);
+            }
         }
 
-        $content = File::get($defaultPath);
-        return json_decode($content, true) ?? [];
+        if (!File::exists($solidFile)) {
+            $solidList=  json_decode($solidFile, true);
+            if (is_array($solidList)) {
+                $defaults = array_merge($defaults, $solidList);
+            }
+        }
+
+        return $defaults;
     }
 
     /**
@@ -64,20 +77,31 @@ class IconManager
      */
     protected function loadCustomIcons(): array
     {
-        $customPath = $this->config['custom_icons_path'] ?? storage_path('app/svg-icons/custom.json');
+        $customIcons = [];
+        $customSolidPath = $this->config['custom_solid_icon'] ?? storage_path('app/svg-icons/solid.json');
+        $customOutlinePath = $this->config['custom_outline_icon'] ?? storage_path('app/svg-icons/outline.json');
 
-        if (!File::exists($customPath)) {
-            return [];
+        if (File::exists($customSolidPath)) {
+            $solidContent = File::get($customSolidPath);
+            $solidData = json_decode($solidContent, true) ?? [];
+            if (is_array($solidData)) {
+                $customIcons = array_merge($customIcons, $solidData);
+            }
         }
-
-        $content = File::get($customPath);
-        return json_decode($content, true) ?? [];
+        if (File::exists($customOutlinePath)) {
+            $outlineContent[] = File::get($customOutlinePath);
+            $outlineData = json_decode($customOutlinePath, true);
+            if (is_array($outlineData)) {
+                $customIcons = array_merge($customIcons, $outlineData);
+            }
+        }
+        return $customIcons;
     }
 
     /**
      * Get an icon by name
      */
-    public function getIcon(string $name, array $attributes = [] ,$render =false): string
+    public function getIcon(string $name, array $attributes = [], $render = false): string
     {
         if (!isset($this->icons[$name])) {
             return $this->renderNotFoundIcon($name, $attributes);
@@ -88,21 +112,21 @@ class IconManager
 
         unset($attributes['iconManager']);
         return $render
-            ?$this->renderSvg($path,$attributes)
+            ? $this->renderSvg($path, $attributes)
             : $path;
     }
 
     /**
      * Render SVG element
      */
-    protected function renderSvg(string $path ,array $attributes): string
+    protected function renderSvg(string $path, array $attributes): string
     {
 
         $attr = '';
 
         foreach ($attributes as $key => $value) {
             if (strlen(trim($value)) === 0) continue;
-            $attr .= $key.'="'.trim($value).'" ';
+            $attr .= $key . '="' . trim($value) . '" ';
         }
         // Add any additional attributes (except special ones we already handled)
 

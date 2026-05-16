@@ -1,39 +1,38 @@
-
 # Extra laravel Package
 
 ## About
-This package is simple and tiny SVG icons fot laravel
+
+A simple and lightweight SVG icon package for Laravel.
 
 ### Author
+
 Sina Zangiband
 
 ### Contact
+
 - [teksite.net](https://teksite.net)
 - [laratek.ir](https://laratek.ir)
 - [teksite.net](https://teksite.net)
 
 ---
 
-## Installation
-
 ### Step 1: Install via Composer
-Run the following command in your CLI:
+
+Run the following command in your terminal:
 
 ```bash
-composer require teksite\icon-laravel
+composer require teksite/icon-laravel
 ```
 
-
-### Step 3: Define gates in the AppServiceProvider
-For laravel 5 or higher version, GatesServiceProvider is discovered automatically, so you don't need to do anything
-
 #### Laravel 5.x and earlier
-If you are using Laravel 5.x or earlier, register the service provider in the `config/app.php` file under the `providers` array:
+
+If you are using Laravel 5.x or earlier, register the service provider in the `config/app.php` file under the
+`providers` array:
 
 ```php
 'providers' => [
     // Other Service Providers
-    Teksite\Authorize\IconLaravelServiceProvider::class,
+    Teksite\IconLaravel\IconLaravelServiceProvider::class,
 ];
 ```
 
@@ -41,108 +40,58 @@ If you are using Laravel 5.x or earlier, register the service provider in the `c
 
 ---
 
-## Use
-Add trait `\Teksite\Authorize\TraitsHasAuthorization` to any model that you want to implement authorization on it such as User model.
+## Usage
 
-### Using in blades
-it can be used by own laravel directive for example for users with `can` directive:
-```bladehtml
-@can('permission')
-    \\ your codes
-@endcan
-```
-or
+### Step 2: Create Blade Component
 
-```bladehtml
-@canany(['permission1' , permission2])
-    \\ your codes
-@endcanany
-```
-in the above code the permission is checked for the current (logged in) user if he/she has the permissions or his/her roles have the permission.
+Create a blade component file named icon.blade.php in resources/views/components/ directory.
 
-### syncing Permissions
-to add/remove permissions directly to a User instances use
-```php
-$user->syncPermissions(permissions: $permissions , detaching:$detaching  ])
-```
-* $permissions : should be arrays of permissions id or Permission instances.
-* $detaching : should be a boolean parameter to determine new permissions should be appended to previous permissions or overwrite them.
-* return void
+Add the following content:
 
-### assign Roles
-to assign roles directly to a User instances use
-```php
-$user->assignRole(permissions: $roles ,detaching: $detaching  ]) :void
-```
-* $roles : should be arrays of roles id or Role instances.
-* $detaching : should be a boolean parameter to determine new permissions should be appended to previous permissions or overwrite them.
-* return void
+@php
+$attributes = array_filter([
+'class' => $class ?? config('icon-laravel.default_class'),
+'viewbox' => $viewbox ?? config('icon-laravel.default_viewbox'),
+'fill' => $fill ?? config('icon-laravel.default_fill'),
+]);
+@endphp
 
-### check having roles
-to check a user has roles
-```php
-$user->hasRole(roles: $roles ,any : $any = true  ])
-```
-* $roles : should be array of roles id/title or Role instances.
-* $any : should be a boolean parameter to determine if user has all roles or at least has one.
-* return boolean
+{!! app(Teksite\IconLaravel\IconManager::class)->getIcon($icon, $attributes) !!}
 
-### check having permissions
-to check a user has a permission directly or through its role
+### Step 3: Use in Blade Template
 
-```php
-$user->hasPermission(permissions: $permission])
-```
-* $permission : should be permission id or permission title.
-* return void
-
-### get all permissions
-to have all permissions of a user instance
-```php
-$user->allPermissions()
-```
-* return collection|array
-
-
-## Add Role and Permission to the app
-
-### permission entries
-```php
-    protected $table = 'auth_permissions';
-
-    protected $fillable = ['title', 'description'];
-```
-#### suggested rules
-use `Permission::rules()` or
-```
-[
- 'title' => 'required|string|max:255|unique:auth_permissions,title',
- 'description' => 'nullable|string|max:255',
-]
-```
-### role entries
-```php
-    protected $table='auth_roles';
-
-    protected $fillable =['title', 'description' ,'hierarchy'];
-```
-#### suggested rules
-use `Role::rules()` or
-```
-[
-  'title'=>'required|string|max:255|unique:auth_roles,title',
-  'description'=>'nullable|string|max:255',
-  'permissions'=>'array|required',
-  'permissions.*'=>'exists:auth_permissions,id',
-  'hierarchy'=>'required','numeric',
-];
-```
-
-
-
-
-
-
+<x-icon icon="example" class="stroke-red-600 fill-none" />
 
 ---
-Feel free to reach out if you have any questions or need assistance with this package!
+
+## Custom Icons
+
+You can add your own SVG icons by creating a JSON file at:
+
+storage_path('app/svg-icons/outline.json') --> for outline svg icons
+storage_path('app/svg-icons/solid.json')  --> for solid svg icons
+
+Tip: Only save the path tags inside the JSON file.
+
+Example custom.json:
+
+[
+{"name": "<path d='M12 2L2 7l10 5 10-5-10-5z'/>"},
+{"name": "<path d='M5 3l14 9-14 9V3z'/>"}
+]
+
+---
+
+## Configuration
+
+You can change the default paths and settings by publishing the config file:
+
+php artisan vendor:publish --provider="Teksite\IconLaravel\IconLaravelServiceProvider"
+
+Then edit config/icon-laravel.php.
+
+---
+
+## Support
+
+Feel free to reach out if you have any questions or need assistance with this package.

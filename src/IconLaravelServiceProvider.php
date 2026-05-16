@@ -42,8 +42,8 @@ class IconLaravelServiceProvider extends ServiceProvider
 
     public function registerStubPath(): void
     {
-        $this->app->bind('icon.default.list', function () {
-            return __DIR__ . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR . 'icons.json';
+        $this->app->bind('icon.default.path', function () {
+            return __DIR__ . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR;
         });
 
     }
