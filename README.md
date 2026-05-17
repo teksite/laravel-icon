@@ -47,20 +47,17 @@ If you are using Laravel 5.x or earlier, register the service provider in the `c
 Create a blade component file named icon.blade.php in resources/views/components/ directory.
 
 Add the following content:
+```
+<svg x="{{$x}}" y="{{$y}}" width="{{$width}}" height="{{$height}}" viewBox="{{$viewbox}}" {{$attributes->merge(['class'=>'tkicon '.$icon]) }} data-icon="{{$icon}}" stroke-width="{{$strokeWidth}}" stroke-linecap="{{$strokeLinecap}}" stroke-linejoin="{{$strokeLinejoin}}">
+   {{ $title && strlen($title) ? "<title>$itlte</title>" : '' }}
+    {!! $path !!}
+</svg>
 
-@php
-$attributes = array_filter([
-'class' => $class ?? config('icon-laravel.default_class'),
-'viewbox' => $viewbox ?? config('icon-laravel.default_viewbox'),
-'fill' => $fill ?? config('icon-laravel.default_fill'),
-]);
-@endphp
-
-{!! app(Teksite\IconLaravel\IconManager::class)->getIcon($icon, $attributes) !!}
-
+```
 ### Step 3: Use in Blade Template
-
+```
 <x-icon icon="example" class="stroke-red-600 fill-none" />
+```
 
 ---
 
