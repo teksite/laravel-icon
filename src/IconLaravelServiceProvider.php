@@ -16,7 +16,7 @@ class IconLaravelServiceProvider extends ServiceProvider
         $this->registerStubPath();
 
         $this->app->singleton(IconManager::class, function ($app) {
-            return new IconManager($app['config']['svg-setting']);
+            return new IconManager();
         });
 
     }

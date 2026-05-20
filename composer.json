@@ -1,6 +1,6 @@
 {
     "name": "teksite/icon-laravel",
-    "description": "This package is a simple and tiny SVG icons fot laravel",
+    "description": "This package is a simple and tiny SVG icons font laravel",
     "authors": [
         {
             "name": "Sina Zangiband",
@@ -15,7 +15,7 @@
         }
     },
     "require": {
-        "laravel/framework": "^13.0"
+        "laravel/framework": "^13"
     },
     "extra": {
         "laravel": {
