@@ -1,36 +1,98 @@
-import outlineList from "./outline.json" assert {type: "json"};
-import solidList from "./solid.json" assert {type: "json"};
+/**
+ * @typedef {'outline' | 'solid'} IconType
+ * @typedef {Record<string, string>} IconMap
+ */
 
-export default function iconSetter(list = null) {
-    const iconSelector = document.querySelectorAll('i.tkicon');
-    iconSelector.forEach(item => {
-        const type = item.getAttribute('data-type') ?? 'outline';
-        const icon = item.getAttribute('data-icon');
-        const iconPath = list ?? (type === 'solid' ? solidList : outlineList);
-        if (iconPath) {
-            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            let attributes = {
-                'title': item.getAttribute('title'),
-                'x': item.getAttribute('x') ?? '0px',
-                'y': item.getAttribute('y') ?? '0px',
-                'width': item.getAttribute('width') ?? item.getAttribute('size') ?? '24',
-                'height': item.getAttribute('height') ?? item.getAttribute('size') ?? '24',
-                'viewBox': item.getAttribute('viewBox') ?? '0 0 24 24',
-                'class': item.classList.toString() + " " + icon,
-                'stroke-width': item.getAttribute('stroke-width') ?? '1',
-                'stroke-linecap': item.getAttribute('stroke-linecap') ?? "round",
-                "stroke-linejoin": item.getAttribute('stroke-linejoin') ?? "round"
-            };
-            Array.from(item.attributes).forEach(attr => {
-                if (!attributes[attr.name]) {
-                    attributes[attr.name] = attr.value;
-                }
-            });
-            for (const [key, value] of Object.entries(attributes)) {
-                if (value) svg.setAttribute(key, value);
+import outlineList from "./outline.json" assert { type: "json" };
+import solidList from "./solid.json" assert { type: "json" };
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const DEFAULTS = {
+    SIZE: "24",
+    VIEW_BOX: "0 0 24 24",
+    STROKE_WIDTH: "1",
+    STROKE_LINECAP: "round",
+    STROKE_LINEJOIN: "round"
+};
+
+/**
+ * @param {IconMap | null} [customList]
+ * @returns {void}
+ */
+export default function iconSetter(customList = null) {
+    const icons = document.querySelectorAll('i.tkicon');
+    if (!icons.length) return;
+
+    icons.forEach(icon => {
+        try {
+            /** @type {IconType} */
+            const type = icon.getAttribute('data-type') ?? 'outline';
+            const name = icon.getAttribute('data-icon');
+
+            if (!name) {
+                console.warn('Missing data-icon attribute');
+                return;
             }
-            svg.innerHTML = iconPath;
-            item.parentNode.replaceChild(svg, item);
+
+            const path = customList?.[name] ?? (type === 'solid' ? solidList[name] : outlineList[name]);
+            if (!path) {
+                console.warn(`Icon "${name}" not found`);
+                return;
+            }
+
+            const svg = createSvgElement(icon, name, path);
+            icon.parentNode?.replaceChild(svg, icon);
+        } catch (err) {
+            console.error('Icon replacement failed:', err);
         }
     });
+}
+
+/**
+ * @param {HTMLElement} original
+ * @param {string} iconName
+ * @param {string} pathData
+ * @returns {SVGElement}
+ */
+function createSvgElement(original, iconName, pathData) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    const attrs = buildAttributes(original, iconName);
+
+    Object.entries(attrs).forEach(([key, value]) => {
+        if (value != null) svg.setAttribute(key, value);
+    });
+
+    svg.innerHTML = pathData;
+    return svg;
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {string} iconName
+ * @returns {Record<string, string | undefined | null>}
+ */
+function buildAttributes(el, iconName) {
+    const get = (attr, def) => el.getAttribute(attr) ?? def;
+
+    const base = {
+        title: get('title'),
+        x: get('x', '0px'),
+        y: get('y', '0px'),
+        width: get('width') ?? get('size', DEFAULTS.SIZE),
+        height: get('height') ?? get('size', DEFAULTS.SIZE),
+        viewBox: get('viewBox', DEFAULTS.VIEW_BOX),
+        class: `${el.classList.toString()} ${iconName}`,
+        'stroke-width': get('stroke-width', DEFAULTS.STROKE_WIDTH),
+        'stroke-linecap': get('stroke-linecap', DEFAULTS.STROKE_LINECAP),
+        'stroke-linejoin': get('stroke-linejoin', DEFAULTS.STROKE_LINEJOIN)
+    };
+
+    for (const attr of Array.from(el.attributes)) {
+        const name = attr.name;
+        if (!base[name] && name !== 'data-type' && name !== 'data-icon') {
+            base[name] = attr.value;
+        }
+    }
+
+    return base;
 }
