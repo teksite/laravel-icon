@@ -36,7 +36,7 @@ class IconLaravelServiceProvider extends ServiceProvider
     public function registerConfig(): void
     {
         $configPath = config_path('icon-setting.php');
-        $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', '/icon-setting');
+        $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', 'icon-setting');
 
     }
 
