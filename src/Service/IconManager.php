@@ -131,12 +131,12 @@ class IconManager
     {
         $attr = '';
         $defaultClass = "$type-icon";
-        $attributes['class'] = ($attributes['class'] ?? '') . ' '.$defaultClass;
+        $attributes['class'] = ($attributes['class'] ?? '') . ' ' . $defaultClass;
 
 
         foreach ($attributes as $key => $value) {
             if (strlen(trim($value)) === 0) continue;
-            $value= trim($value);
+            $value = trim($value);
             $attr .= "$key='$value'";
         }
 
@@ -161,13 +161,15 @@ class IconManager
     /**
      * Get all available icon names for a specific type
      */
-    public function getIconNames(string $type): array
+    public function getIconNames(?string $type = null): array
     {
-        if (!isset($this->iconsByType[$type])) {
-            return [];
-        }
+        $groups = $this->iconsByType;
 
-        return array_keys($this->iconsByType[$type]);
+        if ($type) return array_keys($this->iconsByType[$type] ?? []);
+
+        return array_map(function ($icons) {
+            return array_keys($icons);
+        }, $groups);
     }
 
     /**
