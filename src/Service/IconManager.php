@@ -100,9 +100,8 @@ class IconManager
     /**
      * Get an icon by name
      */
-    public function getIcon(string $name, array $attributes = [], string $type = 'outline', $render = false): string
+    public function getIcon(string $name, array $attributes = [], string $type = 'outline', bool $render = true): string
     {
-
         $iconPath = $this->iconsByType[$type][$name] ?? null;
 
         if (!$iconPath) return $this->renderNotFoundIcon($name, $attributes);
@@ -112,26 +111,37 @@ class IconManager
             : $iconPath;
     }
 
+    public function getAll(): array
+    {
+        $iconsGroup = $this->iconsByType;
+
+        $icon = [];
+        foreach ($iconsGroup as $iconType => $icons) {
+            foreach ($icons as $name => $path) {
+                $icon[$iconType][$name] = $this->renderSvg($path, [], $iconType);
+            }
+        }
+        return $icon;
+    }
+
     /**
      * Render SVG element
      */
-    protected function renderSvg(string $path, array $attributes, string $type = 'outline'): string
+    protected function renderSvg(string $path, array $attributes, string $type): string
     {
         $attr = '';
+        $defaultClass = "$type-icon";
+        $attributes['class'] = ($attributes['class'] ?? '') . ' '.$defaultClass;
 
-        if (!isset($attributes['class'])) {
-            $defaultClass = $type === 'solid' ? 'icon-solid' : 'icon-outline';
-            $attributes['class'] = $defaultClass;
-        }
 
         foreach ($attributes as $key => $value) {
             if (strlen(trim($value)) === 0) continue;
-            $attr .= $key . '="' . trim($value) . '" ';
+            $value= trim($value);
+            $attr .= "$key='$value'";
         }
 
         return "<svg xmlns='http://www.w3.org/2000/svg' $attr>$path</svg>";
     }
-
 
 
     /**
@@ -167,9 +177,6 @@ class IconManager
     {
         return isset(($this->iconsByType)[$type][$name]);
     }
-
-
-
 
 
     protected function isCacheEnabled(): bool

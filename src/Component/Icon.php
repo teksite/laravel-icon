@@ -14,7 +14,7 @@ class Icon extends Component
 
     public function __construct(
         public string  $icon,
-        public ?string $title= null,
+        public ?string $title = null,
         public ?string $type = 'outline',
         public string  $viewbox = "0 0 24 24",
         public string  $x = '0px',
@@ -31,6 +31,7 @@ class Icon extends Component
 
     public function render(): View|Htmlable|\Closure|string
     {
-        return view(config('/icon-setting.component', 'components.icon'), ['path' => $this->iconManager->getIcon($this->icon, type: $this->type)]);
+        $path = $this->iconManager->getIcon($this->icon, type: $this->type, render: false);
+        return view(config('/icon-setting.component', 'components.icon'), ['path' => $path]);
     }
 }
