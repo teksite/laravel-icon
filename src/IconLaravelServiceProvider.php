@@ -5,6 +5,7 @@ namespace Teksite\IconLaravel;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Teksite\IconLaravel\Component\Icon;
+use Teksite\IconLaravel\Component\TekIcon;
 use Teksite\IconLaravel\Service\IconManager;
 
 
@@ -29,8 +30,7 @@ class IconLaravelServiceProvider extends ServiceProvider
         $this->publish();
 
         Blade::component('icon', Icon::class);
-
-
+        Blade::component('tkicon', TekIcon::class);
     }
 
     public function registerConfig(): void

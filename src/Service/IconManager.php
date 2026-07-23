@@ -5,11 +5,11 @@ namespace Teksite\IconLaravel\Service;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class IconManager
 {
     protected array $icons = [];
+
     protected array $config;
     protected array $iconsByType = [];
 
@@ -24,29 +24,21 @@ class IconManager
 
     /**
      * Load and merge icons from default and custom paths
+     *
      * @throws FileNotFoundException
      */
     protected function loadIcons(): void
     {
-        $cacheKey = 'svg_icons.icons';
+        $cacheKey = $this->cacheKey();
 
         if ($this->isCacheEnabled() && Cache::has($cacheKey)) {
             $this->iconsByType = Cache::get($cacheKey);
             return;
         }
 
-        $defaultOutlineIcons = $this->loadDefaultIcons('outline');
-        $customOutlineIcons = $this->loadCustomIcons('outline');
-        $outlineIcons = array_merge($defaultOutlineIcons, $customOutlineIcons);
+        $this->loadDefaultIcons();
 
-        $defaultSolidIcons = $this->loadDefaultIcons('solid');
-        $customSolidIcons = $this->loadCustomIcons('solid');
-        $solidIcons = array_merge($defaultSolidIcons, $customSolidIcons);
-
-        $this->iconsByType = [
-            'outline' => $outlineIcons,
-            'solid' => $solidIcons
-        ];
+        $this->loadCustomIcons();
 
         if ($this->isCacheEnabled()) {
             Cache::put($cacheKey, $this->iconsByType, $this->getCacheTTL());
@@ -55,58 +47,54 @@ class IconManager
 
     /**
      * Load default icons from package
+     *
      * @throws FileNotFoundException
      */
-    protected function loadDefaultIcons(string $type = 'outline'): array
+    protected function loadDefaultIcons(): void
     {
         $defaultPath = app('icon.default.path');
 
-        if ($type === 'solid') {
-            $solidFile = $defaultPath . "solid.json";
-            if (File::exists($solidFile)) {
-                $solidContent = File::get($solidFile);
-                $icons = json_decode($solidContent, true);
-                return is_array($icons) ? $icons : [];
+        foreach (['solid', 'outline'] as $type) {
+
+            $filePath = $defaultPath . "$type.json";
+
+            if (File::exists($filePath)) {
+                $fileContent = File::get($filePath);
+                $icons = json_decode($fileContent, true);
+                $arrayIcon = is_array($icons) ? $icons : [];
+
+                if (isset($arrayIcon[$type])) {
+                    $this->iconsByType[$type][] = $arrayIcon;
+                } else {
+                    $this->iconsByType[$type] = $arrayIcon;
+                }
             }
         }
-
-        if ($type === 'outline') {
-            $outlineFile = $defaultPath . "outline.json";
-            if (File::exists($outlineFile)) {
-                $outlineContent = File::get($outlineFile);
-                $icons = json_decode($outlineContent, true);
-                return is_array($icons) ? $icons : [];
-            }
-        }
-
-        return [];
     }
 
     /**
      * Load custom icons from storage path
+     *
      * @throws FileNotFoundException
      */
-    protected function loadCustomIcons(string $type = 'outline'): array
+    protected function loadCustomIcons(): void
     {
-        if ($type === 'solid') {
-            $customSolidPath = $this->config['custom_solid_icon'] ?? storage_path('app/svg-icons/solid.json');
-            if (File::exists($customSolidPath)) {
-                $solidContent = File::get($customSolidPath);
-                $icons = json_decode($solidContent, true);
-                return is_array($icons) ? $icons : [];
+        $customs = $this->config['custom_icon'] ?? [];
+
+        foreach ($customs as $type => $path) {
+            if (File::exists($path)) {
+                $fileContent = File::get($path);
+                $icons = json_decode($fileContent, true);
+                $arrayIcon = is_array($icons) ? $icons : [];
+                if ($this->iconsByType[$type]) {
+
+                    $this->iconsByType[$type][] = $arrayIcon;
+                } else {
+
+                    $this->iconsByType[$type] = $arrayIcon;
+                }
             }
         }
-
-        if ($type === 'outline') {
-            $customOutlinePath = $this->config['custom_outline_icon'] ?? storage_path('app/svg-icons/outline.json');
-            if (File::exists($customOutlinePath)) {
-                $outlineContent = File::get($customOutlinePath);
-                $icons = json_decode($outlineContent, true);
-                return is_array($icons) ? $icons : [];
-            }
-        }
-
-        return [];
     }
 
     /**
@@ -114,22 +102,14 @@ class IconManager
      */
     public function getIcon(string $name, array $attributes = [], string $type = 'outline', $render = false): string
     {
-        if (!isset($this->iconsByType[$type])) {
-            return $this->renderNotFoundIcon($name, $attributes);
-        }
 
-        $icons = $this->iconsByType[$type];
+        $iconPath = $this->iconsByType[$type][$name] ?? null;
 
-        if (!isset($icons[$name])) {
-            return $this->renderNotFoundIcon($name, $attributes);
-        }
-
-        $path = $icons[$name];
-        unset($attributes['iconManager']);
+        if (!$iconPath) return $this->renderNotFoundIcon($name, $attributes);
 
         return $render
-            ? $this->renderSvg($path, $attributes, $type)
-            : $path;
+            ? $this->renderSvg($iconPath, $attributes, $type)
+            : $iconPath;
     }
 
     /**
@@ -139,7 +119,6 @@ class IconManager
     {
         $attr = '';
 
-        // اضافه کردن کلاس پیش‌فرض براساس type
         if (!isset($attributes['class'])) {
             $defaultClass = $type === 'solid' ? 'icon-solid' : 'icon-outline';
             $attributes['class'] = $defaultClass;
@@ -153,6 +132,8 @@ class IconManager
         return "<svg xmlns='http://www.w3.org/2000/svg' $attr>$path</svg>";
     }
 
+
+
     /**
      * Render a "not found" icon for debugging
      */
@@ -164,14 +145,13 @@ class IconManager
                 htmlspecialchars($name)
             );
         }
-
         return '';
     }
 
     /**
      * Get all available icon names for a specific type
      */
-    public function getIconNames(string $type = 'outline'): array
+    public function getIconNames(string $type): array
     {
         if (!isset($this->iconsByType[$type])) {
             return [];
@@ -183,41 +163,39 @@ class IconManager
     /**
      * Check if an icon exists for a specific type
      */
-    public function hasIcon(string $name, string $type = 'outline'): bool
+    public function hasIcon(string $name, string $type): bool
     {
-        if (!isset($this->iconsByType[$type])) {
-            return false;
-        }
-
-        return isset($this->iconsByType[$type][$name]);
+        return isset(($this->iconsByType)[$type][$name]);
     }
 
-    /**
-     * Clear the icon cache
-     * @throws FileNotFoundException
-     */
-    public function clearCache(): void
-    {
-        Cache::forget('svg_icons.icons');
-        $this->loadIcons();
-    }
 
-    /**
-     * Reload icons from files
-     * @throws FileNotFoundException
-     */
-    public function reload(): void
-    {
-        $this->clearCache();
-    }
+
+
 
     protected function isCacheEnabled(): bool
     {
         return $this->config['cache']['enabled'] ?? true;
     }
 
+    protected function cacheKey(): bool
+    {
+        return $this->config['cache']['key'] ?? 'svg_icons.icons';
+    }
+
     protected function getCacheTTL(): int
     {
         return $this->config['cache']['ttl'] ?? 86400;
     }
+
+    public function clearCache(): void
+    {
+        Cache::forget($this->cacheKey());
+        $this->loadIcons();
+    }
+
+    public function reload(): void
+    {
+        $this->clearCache();
+    }
+
 }
