@@ -32,6 +32,7 @@ class TekIcon extends Component
     {
         $path = $this->iconManager->getIcon($this->icon, type: $this->type);
 
+        $defaultClass = " $this->type-icon";
         return <<<BLADE
 <svg
     x="{{ \$x }}"
@@ -39,7 +40,7 @@ class TekIcon extends Component
     width="{{ \$width }}"
     height="{{ \$height }}"
     viewBox="{{ \$viewbox }}"
-    {{ \$attributes->merge(['class' => 'tkicon ' . \$icon]) }}
+    {{ \$attributes->merge(['class' => 'tkicon ' . \$icon . \$defaultClass]) }}
     data-icon="{{ \$icon }}"
     stroke-width="{{ \$strokeWidth }}"
     stroke-linecap="{{ \$strokeLinecap }}"
