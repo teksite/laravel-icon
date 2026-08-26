@@ -30,7 +30,7 @@ class TekIcon extends Component
 
     public function render(): View|Htmlable|Closure|string
     {
-        $path = $this->iconManager->getIcon($this->icon, type: $this->type);
+        $path = $this->iconManager->getIcon($this->icon, type: $this->type, render :false);
 
         $defaultClass = " $this->type-icon";
 
@@ -46,7 +46,6 @@ class TekIcon extends Component
     stroke-width="{{ \$strokeWidth }}"
     stroke-linecap="{{ \$strokeLinecap }}"
     stroke-linejoin="{{ \$strokeLinejoin }}"
-    fill="none"
     xmlns="http://www.w3.org/2000/svg"
 >
     @if(\$title)

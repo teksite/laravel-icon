@@ -31,14 +31,12 @@ class IconManager
     protected function loadIcons(): void
     {
         $cacheKey = CacheManager::cacheKey();
-dd(CacheManager::isCacheEnabled());
         if (CacheManager::isCacheEnabled() && Cache::has($cacheKey)) {
             $this->iconsByType = Cache::get($cacheKey);
             return;
         }
-dd('dfdfdf');
-        $this->getIconList();
 
+        $this->getIconList();
         if (CacheManager::isCacheEnabled()) {
             Cache::put($cacheKey, $this->iconsByType, CacheManager::getCacheTTL());
         }
@@ -51,15 +49,13 @@ dd('dfdfdf');
      */
     protected function getIconList(): void
     {
-        dd('dddddddddddddddd');
         $paths = $this->config['path'] ?? [];
 
         foreach ($paths ?? [] as $type => $path) {
             if (!File::exists($path)) {
-                $path = __DIR__ . "../resources/$type.json";
+                $path = __DIR__ . "/../resources/$type.json";
                 if (!File::exists($path)) continue;
             }
-
             $fileContent = File::get($path);
             $icons = json_decode($fileContent, true);
             $arrayIcon = is_array($icons) ? $icons : [];
@@ -68,7 +64,6 @@ dd('dfdfdf');
 
         }
     }
-
 
 
     /**
@@ -86,14 +81,14 @@ dd('dfdfdf');
             : $iconPath;
     }
 
-    public function getAll(): array
+    public function getAll(bool $render = true): array
     {
         $iconsGroup = $this->iconsByType;
 
         $icon = [];
         foreach ($iconsGroup as $iconType => $icons) {
             foreach ($icons as $name => $path) {
-                $icon[$iconType][$name] = $this->renderSvg($path, [], $iconType);
+                $icon[$iconType][$name] = $render ? $this->renderSvg($path, [], $iconType) : $path;
             }
         }
         return $icon;
