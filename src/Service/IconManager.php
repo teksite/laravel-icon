@@ -30,16 +30,17 @@ class IconManager
      */
     protected function loadIcons(): void
     {
-        $cacheKey = CacheManager::cacheKey();
-        if (CacheManager::isCacheEnabled() && Cache::has($cacheKey)) {
-            $this->iconsByType = Cache::get($cacheKey);
+        if (!CacheManager::isCacheEnabled()) {
+            $this->getIconList();
             return;
         }
 
-        $this->getIconList();
-        if (CacheManager::isCacheEnabled()) {
-            Cache::put($cacheKey, $this->iconsByType, CacheManager::getCacheTTL());
-        }
+        $cacheKey = CacheManager::cacheKey();
+
+        Cache::remember($cacheKey , CacheManager::getCacheTTL(), function () {
+            $this->getIconList();
+            return $this->iconsByType;
+        });
     }
 
     /**
