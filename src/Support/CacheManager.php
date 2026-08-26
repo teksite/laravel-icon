@@ -12,17 +12,17 @@ class CacheManager
 
     public static function isCacheEnabled(): bool
     {
-        return self::getSetting('enabled' ?? false);
+        return self::getSetting('enabled', false);
     }
 
     public static function cacheKey(): string
     {
-        return self::getSetting('key' ?? 'svg_icons.icons');
+        return self::getSetting('key' ,'svg_icons.icons');
     }
 
     public static function getCacheTTL(): int
     {
-        return self::getSetting('ttl' ?? 86400);
+        return self::getSetting('ttl' ,86400);
     }
 
 

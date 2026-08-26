@@ -32,6 +32,32 @@ class Icon extends Component
     public function render(): View|Htmlable|\Closure|string
     {
         $path = $this->iconManager->getIcon($this->icon, type: $this->type, render: false);
-        return view(config('icon-setting.component', 'components.icon'), ['path' => $path]);
+        $defaultClass = " $this->type-icon";
+
+        $view =config('icon-setting.component', 'components.icon');
+        return \Illuminate\Support\Facades\View::exists($view)
+            ? view($view, ['path' => $path])
+            : <<<BLADE
+<svg
+    x="{{ \$x }}"
+    y="{{ \$y }}"
+    width="{{ \$width }}"
+    height="{{ \$height }}"
+    viewBox="{{ \$viewbox }}"
+    {{ \$attributes->merge(['class' => 'tkicon ' . \$icon . '$defaultClass']) }}
+    data-icon="{{ \$icon }}"
+    stroke-width="{{ \$strokeWidth }}"
+    stroke-linecap="{{ \$strokeLinecap }}"
+    stroke-linejoin="{{ \$strokeLinejoin }}"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    @if(\$title)
+        <title>{{ \$title }}</title>
+    @endif
+
+    {$path}
+</svg>
+BLADE;
     }
+
 }

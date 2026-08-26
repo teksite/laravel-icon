@@ -35,9 +35,7 @@ class IconManager
             return;
         }
 
-        $cacheKey = CacheManager::cacheKey();
-
-        Cache::remember($cacheKey , CacheManager::getCacheTTL(), function () {
+        $this->iconsByType = Cache::remember(CacheManager::cacheKey(), CacheManager::getCacheTTL(), function () {
             $this->getIconList();
             return $this->iconsByType;
         });
