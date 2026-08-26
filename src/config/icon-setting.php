@@ -18,9 +18,9 @@ return [
     | Storage Path for Custom Icons
     |--------------------------------------------------------------------------
     */
-    'custom_icon'=>[
-        'solid'=>storage_path('app/svg-icons/solid.json'),
-        'outline'=>storage_path('app/svg-icons/outline.json'),
+    'path'=>[
+        'solid'=>public_path('vendor/icons/solid.json'),
+        'outline'=>public_path('vendor/icons/outline.json'),
     ],
 
     /*

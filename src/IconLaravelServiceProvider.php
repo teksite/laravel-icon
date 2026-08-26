@@ -19,7 +19,6 @@ class IconLaravelServiceProvider extends ServiceProvider
         $this->app->singleton(IconManager::class, function ($app) {
             return new IconManager();
         });
-
     }
 
     /**
@@ -37,7 +36,6 @@ class IconLaravelServiceProvider extends ServiceProvider
     {
         $configPath = config_path('icon-setting.php');
         $this->mergeConfigFrom(file_exists($configPath) ? $configPath : __DIR__ . '/config/icon-setting.php', 'icon-setting');
-
     }
 
     public function registerStubPath(): void
@@ -45,13 +43,12 @@ class IconLaravelServiceProvider extends ServiceProvider
         $this->app->bind('icon.default.path', function () {
             return __DIR__ . DIRECTORY_SEPARATOR . "resources" . DIRECTORY_SEPARATOR;
         });
-
     }
 
     public function publish(): void
     {
         $this->publishes([
             __DIR__ . '/config/icon-setting.php' => config_path('icon-setting.php'),
-        ], '/icon-setting');
+        ], ['icon','icon-config']);
     }
 }

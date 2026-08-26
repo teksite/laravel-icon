@@ -5,6 +5,7 @@ namespace Teksite\IconLaravel\Service;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Teksite\IconLaravel\Support\CacheManager;
 
 class IconManager
 {
@@ -29,9 +30,9 @@ class IconManager
      */
     protected function loadIcons(): void
     {
-        $cacheKey = $this->cacheKey();
+        $cacheKey = CacheManager::cacheKey();
 
-        if ($this->isCacheEnabled() && Cache::has($cacheKey)) {
+        if (CacheManager::isCacheEnabled() && Cache::has($cacheKey)) {
             $this->iconsByType = Cache::get($cacheKey);
             return;
         }
@@ -40,8 +41,8 @@ class IconManager
 
         $this->loadCustomIcons();
 
-        if ($this->isCacheEnabled()) {
-            Cache::put($cacheKey, $this->iconsByType, $this->getCacheTTL());
+        if (CacheManager::isCacheEnabled()) {
+            Cache::put($cacheKey, $this->iconsByType, CacheManager::getCacheTTL());
         }
     }
 
@@ -52,9 +53,8 @@ class IconManager
      */
     protected function loadDefaultIcons(): void
     {
-        $defaultPath = app('icon.default.path');
-
-        foreach (['solid', 'outline'] as $type) {
+        dd($this->config['path'] ??[]);
+        foreach ($this->config['path'] ??[] as $type) {
 
             $filePath = $defaultPath . "$type.json";
 
@@ -181,30 +181,5 @@ class IconManager
     }
 
 
-    protected function isCacheEnabled(): bool
-    {
-        return $this->config['cache']['enabled'] ?? true;
-    }
-
-    protected function cacheKey(): bool
-    {
-        return $this->config['cache']['key'] ?? 'svg_icons.icons';
-    }
-
-    protected function getCacheTTL(): int
-    {
-        return $this->config['cache']['ttl'] ?? 86400;
-    }
-
-    public function clearCache(): void
-    {
-        Cache::forget($this->cacheKey());
-        $this->loadIcons();
-    }
-
-    public function reload(): void
-    {
-        $this->clearCache();
-    }
 
 }

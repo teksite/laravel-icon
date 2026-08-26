@@ -32,6 +32,6 @@ class Icon extends Component
     public function render(): View|Htmlable|\Closure|string
     {
         $path = $this->iconManager->getIcon($this->icon, type: $this->type, render: false);
-        return view(config('/icon-setting.component', 'components.icon'), ['path' => $path]);
+        return view(config('icon-setting.component', 'components.icon'), ['path' => $path]);
     }
 }
