@@ -25,7 +25,7 @@ class TekIcon extends Component
         public string $strokeLinecap = 'round',
         public string $strokeLinejoin = 'round',
     ) {
-        $this->iconManager = new IconManager();
+        $this->iconManager = app(IconManager::class);
     }
 
     public function render(): View|Htmlable|Closure|string

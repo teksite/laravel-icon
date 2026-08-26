@@ -75,7 +75,7 @@ class IconManager
 
         $iconPath = $this->iconsByType[$type][$name] ?? null;
 
-        if (!$iconPath) return $this->renderNotFoundIcon($name, $attributes);
+        if (is_null($iconPath)) return $this->renderNotFoundIcon($name, $attributes);
 
         return $render
             ? $this->renderSvg($iconPath, $attributes, $type)
@@ -106,9 +106,10 @@ class IconManager
 
 
         foreach ($attributes as $key => $value) {
-            if (strlen(trim($value)) === 0) continue;
-            $value = trim($value);
-            $attr .= "$key='$value'";
+            if (!is_string($value) || strlen(trim($value)) === 0) continue;
+            $value = htmlspecialchars(trim($value));
+            $key = htmlspecialchars(trim($key));
+            $attr .= " $key='" . $value . "'";
         }
 
         return "<svg xmlns='http://www.w3.org/2000/svg' $attr>$path</svg>";
