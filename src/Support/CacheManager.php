@@ -7,9 +7,6 @@ use Illuminate\Support\Facades\Cache;
 class CacheManager
 {
 
-    public static array $cacheSetting = [];
-
-
     public static function isCacheEnabled(): bool
     {
         return self::getSetting('enabled', false);

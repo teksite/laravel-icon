@@ -5,6 +5,7 @@ namespace Teksite\IconLaravel\Component;
 
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\Component;
 use Teksite\IconLaravel\Service\IconManager;
 
@@ -34,10 +35,15 @@ class Icon extends Component
         $path = $this->iconManager->getIcon($this->icon, type: $this->type, render: false);
         $defaultClass = " $this->type-icon";
 
-        $view =config('icon-setting.component', 'components.icon');
-        return \Illuminate\Support\Facades\View::exists($view)
-            ? view($view, ['path' => $path])
-            : <<<BLADE
+        $view = config('icon-setting.component', 'components.icon');
+
+        if (\Illuminate\Support\Facades\View::exists($view)) {
+            return view($view, ['path' => $path]);
+        }
+
+        Log::error("Icon component view [$view] does not exist. so the app use fallback icon view");
+
+       return <<<BLADE
 <svg
     x="{{ \$x }}"
     y="{{ \$y }}"
