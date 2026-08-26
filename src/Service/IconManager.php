@@ -31,15 +31,13 @@ class IconManager
     protected function loadIcons(): void
     {
         $cacheKey = CacheManager::cacheKey();
-
+dd(CacheManager::isCacheEnabled());
         if (CacheManager::isCacheEnabled() && Cache::has($cacheKey)) {
             $this->iconsByType = Cache::get($cacheKey);
             return;
         }
-
-        $this->loadDefaultIcons();
-
-        $this->loadCustomIcons();
+dd('dfdfdf');
+        $this->getIconList();
 
         if (CacheManager::isCacheEnabled()) {
             Cache::put($cacheKey, $this->iconsByType, CacheManager::getCacheTTL());
@@ -51,57 +49,34 @@ class IconManager
      *
      * @throws FileNotFoundException
      */
-    protected function loadDefaultIcons(): void
+    protected function getIconList(): void
     {
-        dd($this->config['path'] ??[]);
-        foreach ($this->config['path'] ??[] as $type) {
+        dd('dddddddddddddddd');
+        $paths = $this->config['path'] ?? [];
 
-            $filePath = $defaultPath . "$type.json";
-
-            if (File::exists($filePath)) {
-                $fileContent = File::get($filePath);
-                $icons = json_decode($fileContent, true);
-                $arrayIcon = is_array($icons) ? $icons : [];
-
-                if (isset($arrayIcon[$type])) {
-                    $this->iconsByType[$type][] = $arrayIcon;
-                } else {
-                    $this->iconsByType[$type] = $arrayIcon;
-                }
+        foreach ($paths ?? [] as $type => $path) {
+            if (!File::exists($path)) {
+                $path = __DIR__ . "../resources/$type.json";
+                if (!File::exists($path)) continue;
             }
+
+            $fileContent = File::get($path);
+            $icons = json_decode($fileContent, true);
+            $arrayIcon = is_array($icons) ? $icons : [];
+
+            $this->iconsByType[$type] = $arrayIcon;
+
         }
     }
 
-    /**
-     * Load custom icons from storage path
-     *
-     * @throws FileNotFoundException
-     */
-    protected function loadCustomIcons(): void
-    {
-        $customs = $this->config['custom_icon'] ?? [];
 
-        foreach ($customs as $type => $path) {
-            if (File::exists($path)) {
-                $fileContent = File::get($path);
-                $icons = json_decode($fileContent, true);
-                $arrayIcon = is_array($icons) ? $icons : [];
-                if ($this->iconsByType[$type]) {
-
-                    $this->iconsByType[$type][] = $arrayIcon;
-                } else {
-
-                    $this->iconsByType[$type] = $arrayIcon;
-                }
-            }
-        }
-    }
 
     /**
      * Get an icon by name
      */
     public function getIcon(string $name, array $attributes = [], string $type = 'outline', bool $render = true): string
     {
+
         $iconPath = $this->iconsByType[$type][$name] ?? null;
 
         if (!$iconPath) return $this->renderNotFoundIcon($name, $attributes);
@@ -179,7 +154,6 @@ class IconManager
     {
         return isset(($this->iconsByType)[$type][$name]);
     }
-
 
 
 }

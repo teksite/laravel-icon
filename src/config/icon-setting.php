@@ -19,7 +19,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'path'=>[
-        'solid'=>public_path('vendor/icons/solid.json'),
+        'solid'=>public_path('vendor/icons/solid.json'), // set it null to read from default icons
         'outline'=>public_path('vendor/icons/outline.json'),
     ],
 

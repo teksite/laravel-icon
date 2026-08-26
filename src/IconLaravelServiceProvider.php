@@ -49,6 +49,6 @@ class IconLaravelServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/config/icon-setting.php' => config_path('icon-setting.php'),
-        ], ['icon','icon-config']);
+        ], ['icon','icon-setting']);
     }
 }
