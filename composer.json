@@ -7,6 +7,15 @@
             "email": "sina.zangiband@gmail.com"
         }
     ],
+    "keywords": [
+        "laravel",
+        "icons",
+        "svg-icons",
+        "svg",
+        "blade",
+        "blade-components",
+        "icon-library"
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true,
     "license": "MIT",
