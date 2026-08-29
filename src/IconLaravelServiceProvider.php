@@ -54,15 +54,15 @@ class IconLaravelServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/resources/outline.json' => public_path('vendor/icons/outline.json'),
-        ], ['icon','icon-assets','icons-outline']);
-
-        $this->publishes([
             __DIR__ . '/resources/solid.json' => public_path('vendor/icons/solid.json'),
-        ], ['icon','icon-assets' ,'icons-solid']);
+        ], ['icon','icon-assets','icons-list']);
+
 
 
         $this->publishes([
             __DIR__ . '/resources/icon-picker.js' => public_path('vendor/icons/icon-picker.js'),
+            __DIR__ . '/resources/outline.json' => public_path('vendor/icons/outline.json'),
+            __DIR__ . '/resources/solid.json' => public_path('vendor/icons/solid.json'),
         ], ['icon','icon-assets' ,'icons-picker']);
     }
 }
