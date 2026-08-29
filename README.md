@@ -63,7 +63,7 @@ return [
     'cache' => [
         'key' => 'svg_icons.icons',
         'enabled' => env('SVG_ICONS_CACHE_ENABLED', false),
-        'ttl' => env('SVG_ICONS_CACHE_TTL', 86400),
+        'ttl' => env('SVG_ICONS_CACHE_TTL', 2592000),
     ],
 
     'path' => [
@@ -442,14 +442,14 @@ SVG_ICONS_CACHE_ENABLED=true
 The default cache TTL is 24 hours:
 
 ```env
-SVG_ICONS_CACHE_TTL=86400
+SVG_ICONS_CACHE_TTL=2592000
 ```
 
 You can customize the cache key:
 
 ```env
 SVG_ICONS_CACHE_ENABLED=true
-SVG_ICONS_CACHE_TTL=86400
+SVG_ICONS_CACHE_TTL=2592000
 ```
 
 Or configure it directly in:
@@ -464,7 +464,7 @@ Example:
 'cache' => [
     'key' => 'svg_icons.icons',
     'enabled' => true,
-    'ttl' => 86400,
+    'ttl' => 2592000,
 ],
 ```
 
