@@ -18,11 +18,25 @@
         "php": "^8.3",
         "laravel/framework": "^13"
     },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+
     "extra": {
         "laravel": {
             "providers": [
                 "Teksite\\IconLaravel\\IconLaravelServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-unit": "phpunit --testsuite=Unit",
+        "test-feature": "phpunit --testsuite=Feature",
+        "test-coverage": "phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
     }
 }
