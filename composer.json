@@ -19,6 +19,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "license": "MIT",
+    "type": "library",
     "autoload": {
         "psr-4": {
             "Teksite\\IconLaravel\\": "src/"
