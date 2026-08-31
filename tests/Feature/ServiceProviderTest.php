@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Teksite\IconLaravel\Tests\Feature;
 
 use Illuminate\Support\Facades\Blade;
